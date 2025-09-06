@@ -1,6 +1,13 @@
 *** Settings ***
 Library    RequestsLibrary
 
+*** Variables ***
+${BASE_URL}    http://localhost:5000
+
+*** Settings ***
+Suite Setup       Create Session    api    ${BASE_URL}
+Suite Teardown    Delete All Sessions
+
 *** Keywords ***
 Response Should Have Message
     [Arguments]    ${resp}    ${expected}
@@ -9,9 +16,9 @@ Response Should Have Message
 
 *** Test Cases ***
 Say Hello With Name
-    ${resp}=    GET    http://localhost:5000/hello    params=name=Jukka
+    ${resp}=    GET On Session    api    /hello    params=name=Jukka
     Response Should Have Message    ${resp}    Hello, Jukka!
 
 Say Hello Without Name
-    ${resp}=    GET    http://localhost:5000/hello
+    ${resp}=    GET On Session    api    /hello
     Response Should Have Message    ${resp}    Hello, Stranger!
