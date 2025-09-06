@@ -56,22 +56,26 @@ pipeline {
       }
     }
 
-    stage('Install Robot & Run Tests') {
-      steps {
-        sh '''
-          set -eux
-          # Luo venv (ei koske imageen)
-          python3 -m venv .venv
-          . .venv/bin/activate
-          pip install --upgrade pip
-          pip install robotframework robotframework-requests
+  stage('Install Robot & Run Tests') {
+    steps {
+      sh '''
+        set -eux
+        # Tarvittavat paketit konttiin
+        apt-get update
+        apt-get install -y python3 python3-venv
 
-          # Aja testit; BASE_URL tulee environmentista
-          robot -v BASE_URL:${BASE_URL} -d robot_output tests/robot
-        '''
-      }
+        # Virtuaaliympäristö ja kirjastot
+        python3 -m venv .venv
+        . .venv/bin/activate
+        pip install --upgrade pip
+        pip install robotframework==7.3.2 robotframework-requests==0.9.7
+
+        # Aja testit; BASE_URL tulee environmentista
+        robot -v BASE_URL:${BASE_URL} -d robot_output tests/robot
+      '''
     }
   }
+
 
   post {
     always {
