@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import calc
 
 app = Flask(__name__)
 
@@ -8,20 +9,59 @@ def hello():
     who = name if name else "Stranger"
     return jsonify({"message": f"Hello, {who}!"})
 
+def _require_params(*names):
+    missing = [n for n in names if not request.args.get(n, "").strip()]
+    if missing:
+        return f"Missing query parameters {', '.join([repr(m) for m in missing])}"
+    return None
+
 @app.get("/add")
 def add():
-    a = request.args.get("a", "").strip()
-    b = request.args.get("b", "").strip()
-    if a == "" or b == "":
-        return jsonify({"error": "Missing query parameters 'a' and/or 'b'"}), 400
+    err = _require_params("a", "b")
+    if err:
+        return jsonify({"error": err}), 400
     try:
-        # sallitaan kokonais- ja liukuluvut
-        a_val = float(a)
-        b_val = float(b)
+        value = calc.add(request.args["a"], request.args["b"])
+        return jsonify({"sum": value})
     except ValueError:
         return jsonify({"error": "Parameters 'a' and 'b' must be numbers"}), 400
-    return jsonify({"sum": a_val + b_val})
+
+@app.get("/subtract")
+def subtract():
+    err = _require_params("a", "b")
+    if err:
+        return jsonify({"error": err}), 400
+    try:
+        value = calc.subtract(request.args["a"], request.args["b"])
+        return jsonify({"result": value})
+    except ValueError:
+        return jsonify({"error": "Parameters 'a' and 'b' must be numbers"}), 400
+
+@app.get("/multiply")
+def multiply():
+    err = _require_params("a", "b")
+    if err:
+        return jsonify({"error": err}), 400
+    try:
+        value = calc.multiply(request.args["a"], request.args["b"])
+        return jsonify({"result": value})
+    except ValueError:
+        return jsonify({"error": "Parameters 'a' and 'b' must be numbers"}), 400
+
+@app.get("/divide")
+def divide():
+    err = _require_params("a", "b")
+    if err:
+        return jsonify({"error": err}), 400
+    try:
+        value = calc.divide(request.args["a"], request.args["b"])
+        return jsonify({"result": value})
+    except ValueError:
+        return jsonify({"error": "Parameters 'a' and 'b' must be numbers"}), 400
+    except ZeroDivisionError:
+        return jsonify({"error": "Division by zero"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
+
 
