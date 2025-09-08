@@ -22,3 +22,6 @@ def add():
         return jsonify({"error": "Parameters 'a' and 'b' must be numbers"}), 400
     return jsonify({"sum": a_val + b_val})
 
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
+
