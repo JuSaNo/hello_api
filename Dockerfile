@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 4) Kopioi sovellus
 COPY app.py ./app.py
+COPY calc.py ./calc.py
 
 # 5) Expose & käynnistys
 EXPOSE 5000
